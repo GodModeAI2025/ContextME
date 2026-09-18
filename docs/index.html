@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ContextMe</title>
-<meta name="description" content="Ein portabler, persönlicher Kontextspeicher für KI-Agenten. Getrennt nach beruflich, privat und Hobby. Belegt mit Quellen. Lokal, offen, ohne Abhängigkeiten.">
-<meta property="og:title" content="ContextMe — persönlicher Kontext für KI-Agenten">
-<meta property="og:description" content="Rollen, Projekte und Prioritäten getrennt nach beruflich, privat und Hobby. Quellenbelegt, lokal, portabel.">
+<meta name="description" content="Ein persönlicher Kontextspeicher für KI-Agenten. Beruflich, privat und Hobby werden getrennt gewichtet. Jede Angabe trägt ihre Quelle. Die Daten liegen lokal bei dir.">
+<meta property="og:title" content="ContextMe: persönlicher Kontext für KI-Agenten">
+<meta property="og:description" content="Rollen, Projekte und Prioritäten, getrennt nach beruflich, privat und Hobby. Mit Quelle zu jeder Angabe. Läuft lokal.">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23b1481f'/><circle cx='16' cy='11' r='4' fill='%23fff'/><path d='M7 27c0-5 4-8.5 9-8.5S25 22 25 27z' fill='%23fff'/></svg>">
 <style>
   :root {
     --bg: #fbfaf8;
@@ -75,7 +75,12 @@
   pre {
     background: var(--code-bg); border: 1px solid var(--border); border-radius: var(--radius);
     padding: 14px 16px; overflow-x: auto; font-size: .84em; line-height: 1.6; margin: 0;
+    max-width: 100%;
   }
+  /* Grid- und Flex-Kinder haben min-width:auto und wachsen sonst auf die
+     Breite des laengsten Codeblocks, was die Seite quer scrollen laesst. */
+  .cards > *, .flow > *, .steps > *, .principles > * { min-width: 0; }
+  .table-scroll { max-width: 100%; }
   pre code { background: none; padding: 0; font-size: 1em; }
   h1, h2, h3 { line-height: 1.22; letter-spacing: -0.015em; }
   h2 { font-size: 1.6rem; margin: 0 0 6px; }
@@ -217,12 +222,13 @@
 
 <header>
   <div class="wrap">
-    <span class="eyebrow">Skill für Claude Code &amp; Codex</span>
+    <span class="eyebrow">Skill für Claude Code und Codex</span>
     <h1>ContextMe</h1>
     <p class="tagline">
-      Ein portabler, persönlicher Kontextspeicher für KI-Agenten. Er lernt deine Rollen,
-      Projekte und Arbeitsweisen — <strong>getrennt nach beruflich, privat und Hobby</strong>,
-      belegt mit Quellen, nachvollziehbar über die Zeit.
+      Ein persönlicher Kontextspeicher für KI-Agenten. Er lernt aus dem, was du sagst,
+      und aus Material, das du freigibst: welche Rollen du hast, woran du arbeitest,
+      wie du unterstützt werden willst. <strong>Beruflich, privat und Hobby werden
+      getrennt gewichtet.</strong> Zu jeder Angabe steht die Quelle dabei.
     </p>
     <div class="cta">
       <a class="btn btn-primary" href="https://github.com/GodModeAI2025/ContextME">Auf GitHub ansehen</a>
@@ -240,24 +246,24 @@
 
 <section id="problem">
   <div class="wrap">
-    <h2>Jede Sitzung beginnt bei null</h2>
+    <h2>Jede Sitzung fängt wieder von vorne an</h2>
     <p class="lede">
-      Du erklärst wieder deine Rolle, dein aktuelles Projekt, deine Arbeitsweise, deine No-Gos.
-      Der Agent rät den Rest — und liegt daneben. Am Ende der Sitzung ist alles wieder weg.
-      Die üblichen Gegenmittel greifen zu kurz:
+      Du erklärst deine Rolle. Dein aktuelles Projekt. Wie du arbeitest, was du nicht willst.
+      Den Rest rät der Agent zusammen und liegt daneben. Wenn die Sitzung endet, ist alles weg.
+      Was man üblicherweise dagegen macht, hilft jeweils halb:
     </p>
     <div class="cards">
       <div class="card">
-        <h3>Langer Prompt in <code>CLAUDE.md</code></h3>
-        <p>Statisch. Veraltet still. Kennt keine Quellen und keine Historie.</p>
+        <h3>Ein langer Prompt in <code>CLAUDE.md</code></h3>
+        <p>Steht fest, während dein Alltag weiterläuft. Veraltet, ohne es zu melden, und sagt nie, woher eine Angabe stammt.</p>
       </div>
       <div class="card">
-        <h3>Anbieter-Memory</h3>
-        <p>Gehört dem Anbieter. Nicht portabel, nicht prüfbar, kein Kontextschnitt.</p>
+        <h3>Das Memory des Anbieters</h3>
+        <p>Liegt beim Anbieter. Du kommst nicht heran, um nachzusehen, zu korrigieren oder es zu einem anderen Werkzeug mitzunehmen.</p>
       </div>
       <div class="card">
-        <h3>Komplettes Second Brain</h3>
-        <p>Ein Dokumentenarchiv beantwortet nicht, <em>was dir gerade wichtig ist</em>.</p>
+        <h3>Ein komplettes Second Brain</h3>
+        <p>Ein Archiv sagt dir, was du abgelegt hast. Es sagt nicht, was davon diese Woche zählt.</p>
       </div>
     </div>
   </div>
@@ -265,15 +271,14 @@
 
 <section id="relevanz">
   <div class="wrap">
-    <h2>Relevanz statt Archiv</h2>
+    <h2>Dasselbe Thema, zwei Gewichte</h2>
     <p class="lede">
-      ContextMe ist kein Wissensspeicher, sondern ein Modell deiner Relevanz. „Mobile" existiert
-      als Thema <strong>einmal</strong> — seine Bedeutung ist eine Beziehung zum Kontext,
-      keine Eigenschaft des Themas.
+      „Mobile“ liegt als Thema <strong>einmal</strong> im Speicher. Wie schwer es wiegt,
+      hängt am Kontext und nicht am Thema. Genau das bildet ContextMe ab.
     </p>
     <div class="table-scroll">
       <table class="rel">
-        <caption>Dasselbe Thema, zwei Kontexte — kein Widerspruch, sondern der Normalzustand eines Menschen.</caption>
+        <caption>Bei den meisten Menschen sieht der Normalzustand so aus.</caption>
         <thead>
           <tr><th scope="col">Thema</th><th scope="col">Beruflich</th><th scope="col">Privat</th></tr>
         </thead>
@@ -284,20 +289,21 @@
       </table>
     </div>
     <p>
-      Ein Agent, der das nicht trennt, gibt dir private Antworten im Meeting und berufliche
-      Antworten am Wochenende. Wechselst du die Rolle, wird die alte Rolle
-      <strong>historisch, nicht gelöscht</strong>. Ein altes berufliches Dokument bleibt
-      beruflicher Herkunft, auch wenn sein Inhalt heute privat nützlich ist.
+      Ein Agent, der die beiden Seiten in einen Topf wirft, antwortet dir im Meeting privat
+      und am Wochenende beruflich. Wechselst du die Rolle, bekommt die alte ein Enddatum und
+      bleibt im Speicher stehen. Ein altes berufliches Dokument behält seine berufliche
+      Herkunft, auch wenn sein Inhalt dir heute privat weiterhilft.
     </p>
   </div>
 </section>
 
 <section id="funktionsweise">
   <div class="wrap">
-    <h2>Modell interpretiert, Python rechnet</h2>
+    <h2>Die Arbeit ist geteilt</h2>
     <p class="lede">
-      Die Arbeit ist bewusst zweigeteilt. Deshalb ist die Gewichtung reproduzierbar und die
-      Herkunft jeder Angabe nachvollziehbar — auch wenn das Modell sich einmal irrt.
+      Das Modell liest und interpretiert. Python speichert, prüft und rechnet. Diese Teilung
+      hat einen Grund: Die Gewichtung läuft jedes Mal gleich ab, und du siehst zu jeder
+      Angabe, woher sie kommt. Auch dann, wenn sich das Modell beim Lesen geirrt hat.
     </p>
     <div class="flow">
       <div class="card">
@@ -306,7 +312,7 @@
           <li>Material lesen</li>
           <li>Semantik verstehen</li>
           <li>Angaben ableiten</li>
-          <li>Quelle &amp; Herkunft trennen</li>
+          <li>Quelle und Herkunft trennen</li>
         </ul>
       </div>
       <div class="arrows">
@@ -316,44 +322,46 @@
       <div class="card">
         <h3>Lokale Laufzeit</h3>
         <ul>
-          <li>Schema &amp; Referenzen prüfen</li>
-          <li>Historie &amp; Gültigkeit</li>
-          <li>Gewichtung &amp; Trend</li>
+          <li>Schema und Referenzen prüfen</li>
+          <li>Historie und Gültigkeit</li>
+          <li>Gewichtung und Trend</li>
           <li>Sichten erzeugen</li>
         </ul>
       </div>
     </div>
     <p class="note">
-      Reine Python-Standardbibliothek. Kein Konto, kein Dienst, kein API-Schlüssel,
-      kein Netzwerkzugriff in der Laufzeit.
+      Reine Python-Standardbibliothek. Kein Konto, kein API-Schlüssel, kein Netzwerkzugriff
+      in der Laufzeit.
     </p>
   </div>
 </section>
 
 <section id="prinzipien">
   <div class="wrap">
-    <h2>Vier Prinzipien</h2>
+    <h2>Woran sich der Speicher hält</h2>
     <ol class="principles">
       <li>
-        <strong>Alles ist belegt.</strong>
-        <span>Jede Angabe trägt Quelle, Zeitpunkt und Herkunft: <code>explicit</code> (direkte
-        Selbstaussage), <code>document</code> (importiertes Material), <code>inferred</code>
-        (Interpretation). Eine Aussage im Dokument wird nie zur Selbstaussage hochgestuft.</span>
+        <strong>Zu jeder Angabe gehört eine Quelle.</strong>
+        <span>Dazu kommen Zeitpunkt und Herkunft: <code>explicit</code> für das, was du selbst
+        gesagt hast, <code>document</code> für importiertes Material, <code>inferred</code> für
+        eine Interpretation. Aus einem Satz im Dokument wird nie eine Selbstaussage.</span>
       </li>
       <li>
-        <strong>Relevanz ist zeit- und kontextabhängig.</strong>
-        <span>Häufigkeit klingt zeitlich ab, Massenimporte werden gedämpft, Duplikate zählen
-        nicht doppelt. Ein Agentenabruf ist keine Aktivität von dir.</span>
+        <strong>Gewicht hängt an Zeit und Kontext.</strong>
+        <span>Häufigkeit klingt über die Zeit ab, ein Massenimport wird gedämpft, Duplikate
+        zählen einfach. Wenn ein Agent deinen Speicher abfragt, gilt das nicht als deine
+        Aktivität.</span>
       </li>
       <li>
-        <strong>Explizit schlägt abgeleitet.</strong>
+        <strong>Was du sagst, schlägt jede Ableitung.</strong>
         <span>Eine Korrektur setzt sich gegen jedes statistische Muster durch. Ableitungen
-        unter dem Grenzwert <code>0.70</code> landen in einer Prüfliste statt im Profil.</span>
+        unter dem Grenzwert <code>0.70</code> landen in einer Prüfliste und gehen erst nach
+        deiner Freigabe ins Profil.</span>
       </li>
       <li>
         <strong>Der Speicher gehört dir.</strong>
-        <span>Klartext-JSON in einem Ordner deiner Wahl. Du kannst ihn lesen, sichern,
-        versionieren, löschen — und zwischen Claude Code und Codex mitnehmen.</span>
+        <span>Klartext-JSON in einem Ordner deiner Wahl. Du liest ihn, sicherst ihn,
+        versionierst ihn, löschst ihn, und nimmst ihn zwischen Claude Code und Codex mit.</span>
       </li>
     </ol>
   </div>
@@ -363,8 +371,8 @@
   <div class="wrap">
     <h2>24 Erhebungsdimensionen</h2>
     <p class="lede">
-      Alle sind ab dem ersten Start vorhanden. Kein Interview mit 60 Pflichtfragen: Was im
-      Material steht, wird erhoben; was fehlt, bleibt als unbekannt gekennzeichnet.
+      Alle stehen ab dem ersten Start bereit. Ein Interview mit 60 Pflichtfragen bleibt dir
+      erspart: Was im Material steht, wird erhoben. Was fehlt, steht als unbekannt drin.
     </p>
     <div class="dims">
       <span class="dim">Identität</span><span class="dim">Unternehmen</span><span class="dim">Rollen</span>
@@ -373,10 +381,10 @@
       <span class="dim">Werte</span><span class="dim">Stärken</span><span class="dim">Arbeitsweise</span>
       <span class="dim">Entscheidungen</span><span class="dim">Kommunikation</span><span class="dim">Vorlieben</span>
       <span class="dim">Abneigungen</span><span class="dim">Erwartungen an die KI</span><span class="dim">Life Library</span>
-      <span class="dim">Routinen &amp; SOPs</span><span class="dim">Reflexionen</span><span class="dim">Werkzeuge</span>
+      <span class="dim">Routinen und SOPs</span><span class="dim">Reflexionen</span><span class="dim">Werkzeuge</span>
       <span class="dim">Rahmenbedingungen</span>
-      <span class="dim opt">persönlicher Kontext · optional</span>
-      <span class="dim opt">Selbstbeschreibung · optional</span>
+      <span class="dim opt">persönlicher Kontext, optional</span>
+      <span class="dim opt">Selbstbeschreibung, optional</span>
     </div>
   </div>
 </section>
@@ -385,8 +393,8 @@
   <div class="wrap">
     <h2>In drei Schritten</h2>
     <p class="lede">
-      Voraussetzung: Python 3.10+ und ein eingerichtetes Claude Code oder Codex mit Datei-
-      und Ausführungszugriff.
+      Du brauchst Python 3.10 oder neuer und ein eingerichtetes Claude Code oder Codex mit
+      Datei- und Ausführungszugriff.
     </p>
     <div class="steps">
       <div>
@@ -395,9 +403,9 @@
 cd ContextME
 python3 skill/scripts/install.py --target both --workspace "$HOME/ContextMe"</code></pre>
         <p class="note">
-          Kopiert den Skill nach <code>~/.claude/skills/contextme</code> und
-          <code>~/.agents/skills/contextme</code> und legt den privaten Arbeitsordner an.
-          Unter Windows <code>py -3</code> verwenden.
+          Der Installer legt den Skill unter <code>~/.claude/skills/contextme</code> und
+          <code>~/.agents/skills/contextme</code> ab und richtet deinen privaten Arbeitsordner
+          ein. Unter Windows nimmst du <code>py -3</code>.
         </p>
       </div>
       <div>
@@ -406,9 +414,9 @@ python3 skill/scripts/install.py --target both --workspace "$HOME/ContextMe"</co
             Kontextprofil zuerst aus dem Material, das ich dir gebe,
             und frage nur wesentliche Lücken nach.</code></pre>
         <p class="note">
-          Du gibst Notizen, Transkripte oder freigegebene Mails — der Agent extrahiert Rollen,
-          Projekte, Ziele und Arbeitsweisen selbst. Du schreibst kein JSON. In Codex
-          entsprechend <code>$contextme</code>.
+          Du gibst Notizen, Transkripte oder freigegebene Mails hinein. Rollen, Projekte,
+          Ziele und Arbeitsweisen holt der Agent selbst heraus, JSON schreibst du keins.
+          In Codex heißt der Aufruf <code>$contextme</code>.
         </p>
       </div>
       <div>
@@ -416,8 +424,8 @@ python3 skill/scripts/install.py --target both --workspace "$HOME/ContextMe"</co
         <pre><code>python3 skill/scripts/contextme.py --workspace "$HOME/ContextMe" context \
   --context work --query "Aktuelle Rolle und Prioritäten" --max-chars 12000</code></pre>
         <p class="note">
-          Liefert ein begrenztes JSON-Paket mit Angaben, Quellen-IDs, Herkunft, Unsicherheit
-          und Relevanz — statt „kopiere mein ganzes Leben in den Prompt".
+          Zurück kommt ein begrenztes JSON-Paket mit Angaben, Quellen-IDs, Herkunft,
+          Unsicherheit und Relevanz. Dein restliches Leben bleibt aus dem Prompt heraus.
         </p>
       </div>
     </div>
@@ -433,11 +441,11 @@ python3 skill/scripts/install.py --target both --workspace "$HOME/ContextMe"</co
         <tbody>
           <tr><td><code>init</code></td><td>Neuen Arbeitsordner anlegen</td></tr>
           <tr><td><code>doctor</code></td><td>Speicher auf Konsistenz prüfen</td></tr>
-          <tr><td><code>material --input</code></td><td>Lokale Datei lesen (Text, Markdown, JSON, CSV, HTML, EML) — speichert nichts</td></tr>
-          <tr><td><code>ingest --batch</code></td><td>Belegten Batch validieren und übernehmen, optional <code>--dry-run</code></td></tr>
+          <tr><td><code>material --input</code></td><td>Lokale Datei lesen: Text, Markdown, JSON, CSV, HTML, EML. Speichert nichts</td></tr>
+          <tr><td><code>ingest --batch</code></td><td>Belegten Batch validieren und übernehmen, wahlweise mit <code>--dry-run</code></td></tr>
           <tr><td><code>snapshot --context</code></td><td>Aktuelle Sicht für einen Kontext</td></tr>
           <tr><td><code>context --context</code></td><td>Begrenztes Kontextpaket für einen anderen Agenten</td></tr>
-          <tr><td><code>classify --text</code></td><td>Material einordnen — lesend, erzeugt kein Lernsignal</td></tr>
+          <tr><td><code>classify --text</code></td><td>Material einordnen. Liest, erzeugt kein Lernsignal</td></tr>
           <tr><td><code>interview</code></td><td>Offene Lücken je Dimension zeigen</td></tr>
           <tr><td><code>update-now</code></td><td>Gewichtungen und Sichten neu berechnen</td></tr>
           <tr><td><code>review --id --decision</code></td><td>Unsichere Hypothesen annehmen oder ablehnen</td></tr>
@@ -450,24 +458,26 @@ python3 skill/scripts/install.py --target both --workspace "$HOME/ContextMe"</co
 
 <section id="grenzen">
   <div class="wrap">
-    <h2>Grenzen — ehrlich statt beruhigend</h2>
+    <h2>Was ContextMe nicht leistet</h2>
     <p class="lede">
-      ContextMe verspricht keine Sicherheit, die es nicht herstellen kann. Was es nicht leistet,
-      steht genauso in der Dokumentation wie das, was es leistet.
+      Ein paar Dinge solltest du wissen, bevor du persönliche Daten hineinlegst. Sie stehen
+      genauso in der Dokumentation.
     </p>
     <ul class="limits">
-      <li>Die lokalen Skripte arbeiten ohne Netzwerk. Das heißt <strong>nicht</strong>, dass die
-        semantische Verarbeitung lokal bleibt — was beim Modellanbieter landet, entscheidet der Host.</li>
-      <li>ContextMe hat <strong>keine eigene Verschlüsselung</strong>. Die Daten liegen als Klartext vor.
-        Dateiberechtigungen und verschlüsselter Datenträger bleiben erforderlich.</li>
-      <li>Die Kontextfilter sind <strong>keine Zugriffssteuerung</strong> gegenüber einem Agenten, der
-        ohnehin alle Dateien lesen darf. Für echte Isolation: getrennte Arbeitsordner.</li>
-      <li>Kein Hintergrunddienst, kein Postfach-Crawler. Der Skill liest nur, was der Host
-        bereitstellt, und läuft nur, wenn er aufgerufen wird.</li>
-      <li>Sensible persönliche Attribute werden <strong>nicht aus Material erschlossen</strong> — nur bei
-        ausdrücklichem Auftrag und bewusstem <code>--allow-sensitive</code>. Passwörter und Token nie.</li>
-      <li>Keine psychologische Diagnose, kein allgemeines Wissensarchiv. Ein Modell kann beim
-        Interpretieren irren — deshalb bleiben Quelle, Herkunft und Korrektur Teil jeder Aussage.</li>
+      <li>Die lokalen Skripte arbeiten ohne Netzwerk. Über die semantische Verarbeitung sagt das
+        <strong>nichts</strong> aus: Was beim Modellanbieter landet, entscheidet dein Host.</li>
+      <li>ContextMe bringt <strong>keine eigene Verschlüsselung</strong> mit. Die Daten liegen im
+        Klartext. Dateiberechtigungen und ein verschlüsselter Datenträger bleiben deine Aufgabe.</li>
+      <li>Die Kontextfilter sind <strong>keine Zugriffssteuerung</strong> gegenüber einem Agenten,
+        der ohnehin alle Dateien lesen darf. Für echte Trennung brauchst du getrennte Arbeitsordner.</li>
+      <li>Es gibt keinen Hintergrunddienst und keinen Postfach-Crawler. Der Skill sieht, was der
+        Host ihm reicht, und läuft, wenn er aufgerufen wird.</li>
+      <li>Sensible persönliche Attribute leitet er <strong>nicht aus Material ab</strong>. Sie gehen
+        erst nach ausdrücklichem Auftrag und mit <code>--allow-sensitive</code> in den Speicher.
+        Passwörter und Token niemals.</li>
+      <li>Keine psychologische Diagnose, kein allgemeines Wissensarchiv. Beim Interpretieren irrt ein
+        Modell gelegentlich, deshalb hängen an jeder Aussage Quelle, Herkunft und die Möglichkeit
+        zur Korrektur.</li>
     </ul>
   </div>
 </section>
@@ -482,7 +492,7 @@ python3 skill/scripts/install.py --target both --workspace "$HOME/ContextMe"</co
       <a href="https://github.com/GodModeAI2025/ContextME/blob/main/LICENSE">Apache-2.0</a>
     </div>
     <p style="margin:0">
-      ContextMe 1.0.0 · Der Speicher gehört dir, nicht dem Modellanbieter.
+      ContextMe 1.0.0 · Dein Speicher liegt auf deiner Platte.
     </p>
   </div>
 </footer>
