@@ -1,0 +1,391 @@
+{
+  "schema_version": 1,
+  "description": "Coverage map synthesized from the user-supplied screenshots and requested contextual model. Fields are optional, extensible and evidence-backed.",
+  "dimensions": [
+    {
+      "id": "identity",
+      "label": "Identität, Hintergrund und Biografie",
+      "predicates": [
+        "display_name",
+        "bio",
+        "birth_date",
+        "age_as_of",
+        "timezone",
+        "languages",
+        "career_history"
+      ],
+      "entity_kinds": [
+        "person"
+      ],
+      "question": "Wie soll ich dich ansprechen, und welcher kurze Hintergrund hilft einer KI, dich richtig einzuordnen?",
+      "optional": false
+    },
+    {
+      "id": "organizations",
+      "label": "Unternehmen, Jobs und Organisationen",
+      "predicates": [
+        "industry",
+        "company_profile",
+        "products",
+        "audience",
+        "culture",
+        "strategy"
+      ],
+      "entity_kinds": [
+        "organization"
+      ],
+      "question": "Für welche Unternehmen oder Organisationen bist du derzeit tätig? Mehrere parallele Tätigkeiten sind möglich.",
+      "optional": false
+    },
+    {
+      "id": "roles",
+      "label": "Rollen, Verantwortung und Aufgaben",
+      "predicates": [
+        "responsibilities",
+        "mission",
+        "reporting_line",
+        "deliverables",
+        "success_metrics"
+      ],
+      "entity_kinds": [
+        "role"
+      ],
+      "question": "Welche aktuellen Rollen hast du dort, wofür bist du verantwortlich und welche früheren Rollen bleiben fachlich relevant?",
+      "optional": false
+    },
+    {
+      "id": "team",
+      "label": "Team, Stakeholder und Zusammenarbeit",
+      "predicates": [
+        "team_structure",
+        "collaboration",
+        "escalation",
+        "stakeholder"
+      ],
+      "entity_kinds": [
+        "relationship"
+      ],
+      "question": "Mit welchen Rollen oder Teams arbeitest du zusammen, und wann sollte eine KI sie berücksichtigen? Namen sind nicht nötig.",
+      "optional": false
+    },
+    {
+      "id": "projects",
+      "label": "Projekte und deren Zustand",
+      "predicates": [
+        "status",
+        "outcome",
+        "next_action",
+        "milestones",
+        "risks",
+        "blockers",
+        "project"
+      ],
+      "entity_kinds": [
+        "project"
+      ],
+      "question": "Welche beruflichen und privaten Projekte laufen gerade, mit welchem Ziel, Zustand und nächsten Schritt?",
+      "optional": false
+    },
+    {
+      "id": "tasks",
+      "label": "Aufgaben, Kalender und Verpflichtungen",
+      "predicates": [
+        "due_at",
+        "scheduled_at",
+        "recurring",
+        "cadence",
+        "dependencies"
+      ],
+      "entity_kinds": [
+        "task"
+      ],
+      "question": "Welche Aufgaben, Termine oder wiederkehrenden Verpflichtungen bestimmen aktuell deine Prioritäten?",
+      "optional": false
+    },
+    {
+      "id": "goals",
+      "label": "Vision und kurz- bis langfristige Ziele",
+      "predicates": [
+        "vision",
+        "one_year_goal",
+        "five_year_goal",
+        "success_definition",
+        "legacy"
+      ],
+      "entity_kinds": [
+        "goal"
+      ],
+      "question": "Was möchtest du kurzfristig und langfristig erreichen, und woran würdest du Fortschritt erkennen?",
+      "optional": false
+    },
+    {
+      "id": "interests",
+      "label": "Interessen und thematische Schwerpunkte",
+      "predicates": [
+        "priority",
+        "pinned_priority",
+        "interest",
+        "familiarity",
+        "interest_reason"
+      ],
+      "entity_kinds": [
+        "topic"
+      ],
+      "question": "Welche Themen sind gerade wichtig: beruflich, privat oder als Hobby? Wo hat sich die Gewichtung verändert?",
+      "optional": false
+    },
+    {
+      "id": "hobbies",
+      "label": "Hobbys und private Vorhaben",
+      "predicates": [
+        "leisure",
+        "hobby_routine",
+        "hobby_goal"
+      ],
+      "entity_kinds": [
+        "hobby"
+      ],
+      "question": "Welche Hobbys verfolgst du, und gibt es dazu konkrete Projekte oder Vorhaben?",
+      "optional": false
+    },
+    {
+      "id": "values",
+      "label": "Werte, Prinzipien und Grenzen",
+      "predicates": [
+        "principles",
+        "values",
+        "non_negotiables",
+        "integrity",
+        "tradeoffs"
+      ],
+      "entity_kinds": [
+        "value"
+      ],
+      "question": "Welche Prinzipien oder Grenzen sollen Entscheidungen und Empfehlungen berücksichtigen?",
+      "optional": false
+    },
+    {
+      "id": "strengths",
+      "label": "Fähigkeiten, Stärken und Lernfelder",
+      "predicates": [
+        "competence",
+        "strengths",
+        "learning_goal",
+        "feedback",
+        "expertise"
+      ],
+      "entity_kinds": [
+        "skill"
+      ],
+      "question": "Was kannst du gut, wobei suchen andere deinen Rat und welche Fähigkeiten möchtest du entwickeln?",
+      "optional": false
+    },
+    {
+      "id": "working",
+      "label": "Arbeitsweise, Fokus und Energie",
+      "predicates": [
+        "work_style",
+        "working_hours",
+        "focus",
+        "planning_style",
+        "prioritization",
+        "time_budget"
+      ],
+      "entity_kinds": [
+        "preference"
+      ],
+      "question": "Wie arbeitest und priorisierst du am besten, und welche Rahmenbedingungen muss eine KI respektieren?",
+      "optional": false
+    },
+    {
+      "id": "decisions",
+      "label": "Entscheidungsverhalten mit Belegen",
+      "predicates": [
+        "decision_style",
+        "criteria",
+        "alternatives",
+        "rationale",
+        "outcome",
+        "reversibility"
+      ],
+      "entity_kinds": [
+        "decision"
+      ],
+      "question": "Welche konkrete Entscheidung zeigt gut, wie du Kriterien, Risiken, Zeit und Qualität gegeneinander abwägst?",
+      "optional": false
+    },
+    {
+      "id": "communication",
+      "label": "Kommunikation und Feedback",
+      "predicates": [
+        "communication",
+        "tone",
+        "format",
+        "channels",
+        "response_time",
+        "urgency",
+        "feedback_style",
+        "conflict_style",
+        "async_sync"
+      ],
+      "entity_kinds": [],
+      "question": "Wie soll die KI mit dir kommunizieren, Ergebnisse strukturieren, Widerspruch äußern und Feedback geben?",
+      "optional": false
+    },
+    {
+      "id": "likes",
+      "label": "Vorlieben und positive Zusammenarbeit",
+      "predicates": [
+        "likes",
+        "energizers",
+        "motivating_feedback",
+        "good_collaboration"
+      ],
+      "entity_kinds": [],
+      "question": "Was motiviert dich, und welche Eigenschaften machen Zusammenarbeit für dich besonders hilfreich?",
+      "optional": false
+    },
+    {
+      "id": "dislikes",
+      "label": "Abneigungen und zu vermeidende Muster",
+      "predicates": [
+        "dislikes",
+        "no_gos",
+        "drains",
+        "bad_meetings",
+        "common_mistakes",
+        "unlearning"
+      ],
+      "entity_kinds": [],
+      "question": "Welche Arbeits- oder Kommunikationsmuster soll die KI vermeiden?",
+      "optional": false
+    },
+    {
+      "id": "ai_contract",
+      "label": "Erwartungen an die KI",
+      "predicates": [
+        "ai_expectations",
+        "autonomy",
+        "clarification",
+        "evidence_requirements",
+        "acceptance_criteria",
+        "output_contract"
+      ],
+      "entity_kinds": [],
+      "question": "Was soll die KI eigenständig tun, wann rückfragen und wie muss sie Unsicherheit oder Quellen kenntlich machen?",
+      "optional": false
+    },
+    {
+      "id": "library",
+      "label": "Life Library: Bücher, Videos, Podcasts und Ressourcen",
+      "predicates": [
+        "medium",
+        "author",
+        "title",
+        "uri",
+        "key_ideas",
+        "personal_notes",
+        "application",
+        "influence",
+        "consumption_state"
+      ],
+      "entity_kinds": [
+        "resource"
+      ],
+      "question": "Welche Materialien haben deine Arbeit oder Interessen beeinflusst, und was möchtest du daraus anwenden?",
+      "optional": false
+    },
+    {
+      "id": "procedures",
+      "label": "Routinen, SOPs und wiederholbare Abläufe",
+      "predicates": [
+        "steps",
+        "trigger",
+        "quality_gate",
+        "inputs",
+        "outputs",
+        "frequency"
+      ],
+      "entity_kinds": [
+        "routine"
+      ],
+      "question": "Welche wiederkehrenden Abläufe oder Routinen soll die KI kennen, ohne sie ungefragt auszuführen?",
+      "optional": false
+    },
+    {
+      "id": "reviews",
+      "label": "Reflexion, Rückblicke und Lernen",
+      "predicates": [
+        "review_date",
+        "observations",
+        "lessons",
+        "progress",
+        "corrections",
+        "experiments"
+      ],
+      "entity_kinds": [
+        "review"
+      ],
+      "question": "Welche Erfahrungen oder Rückblicke verändern gerade deine Prioritäten oder Arbeitsweise?",
+      "optional": false
+    },
+    {
+      "id": "tools",
+      "label": "Werkzeuge und Wissensquellen",
+      "predicates": [
+        "purpose",
+        "usage_frequency",
+        "environment",
+        "source_location",
+        "tool_constraints"
+      ],
+      "entity_kinds": [
+        "tool"
+      ],
+      "question": "Mit welchen Werkzeugen und Wissensquellen arbeitest du, und welche davon darf der Skill auswerten?",
+      "optional": false
+    },
+    {
+      "id": "constraints",
+      "label": "Rahmenbedingungen und Ressourcen",
+      "predicates": [
+        "budget",
+        "availability",
+        "privacy_scope",
+        "confidentiality",
+        "accessibility",
+        "constraints"
+      ],
+      "entity_kinds": [
+        "constraint"
+      ],
+      "question": "Welche zeitlichen, finanziellen, technischen oder vertraulichen Grenzen gelten für diesen Kontext?",
+      "optional": false
+    },
+    {
+      "id": "personal",
+      "label": "Optionaler persönlicher Kontext",
+      "predicates": [
+        "family_context",
+        "celebration",
+        "personal_milestone",
+        "fun_fact",
+        "wellbeing_routine"
+      ],
+      "entity_kinds": [],
+      "question": "Gibt es freiwillige persönliche Angaben, die für eine konkrete Unterstützung nützlich sind? Auslassen ist vollkommen in Ordnung.",
+      "optional": true
+    },
+    {
+      "id": "self_description",
+      "label": "Optionale Selbstbeschreibung",
+      "predicates": [
+        "self_reported_personality",
+        "self_description"
+      ],
+      "entity_kinds": [],
+      "question": "Welche Selbstbeschreibung möchtest du ausdrücklich festhalten? Keine Diagnose oder Charakterzuschreibung wird aus Dokumenten abgeleitet.",
+      "optional": true
+    }
+  ]
+}

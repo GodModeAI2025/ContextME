@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run test suite
+        run: python -m unittest discover -s skill/tests -v
+      - name: Verify skill manifest
+        working-directory: skill
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib, sys
+          manifest = json.load(open("MANIFEST.sha256.json"))
+          bad = []
+          for name, expected in manifest.items():
+              path = pathlib.Path(name)
+              if not path.exists():
+                  bad.append(f"{name}: missing")
+              elif hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                  bad.append(f"{name}: hash mismatch")
+          if bad:
+              print("\n".join(bad))
+              sys.exit(1)
+          print(f"{len(manifest)} files verified")
+          PY
