@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "entities": [
+    {
+      "id": "me",
+      "kind": "person",
+      "name": "Beispielperson",
+      "aliases": []
+    },
+    {
+      "id": "org-example",
+      "kind": "organization",
+      "name": "Beispielunternehmen",
+      "aliases": []
+    },
+    {
+      "id": "role-mobile",
+      "kind": "role",
+      "name": "Frühere Leitung Mobile Development",
+      "aliases": []
+    },
+    {
+      "id": "role-ai",
+      "kind": "role",
+      "name": "Konzernexperte KI",
+      "aliases": []
+    },
+    {
+      "id": "mobile",
+      "kind": "topic",
+      "name": "Mobile",
+      "aliases": [
+        "iOS",
+        "iPhone",
+        "mobile Entwicklung"
+      ]
+    },
+    {
+      "id": "ai",
+      "kind": "topic",
+      "name": "Künstliche Intelligenz",
+      "aliases": [
+        "KI",
+        "AI",
+        "LLM"
+      ]
+    },
+    {
+      "id": "podcasting",
+      "kind": "hobby",
+      "name": "Podcasting",
+      "aliases": [
+        "Podcasts"
+      ]
+    },
+    {
+      "id": "podcast-project",
+      "kind": "project",
+      "name": "Privater KI-Podcast",
+      "aliases": []
+    },
+    {
+      "id": "working-preference",
+      "kind": "preference",
+      "name": "Belegte, konkrete Ergebnisse",
+      "aliases": []
+    }
+  ],
+  "sources": [
+    {
+      "id": "demo-statement",
+      "kind": "statement",
+      "author": "user",
+      "activity": "reference",
+      "observed_at": "2026-09-17T00:00:00Z",
+      "uri": "example://contextme/demonstration",
+      "title": "Fiktive Selbstauskunft für den Funktionstest"
+    }
+  ],
+  "claims": [
+    {
+      "subject": "role-mobile",
+      "predicate": "status",
+      "value": "ended",
+      "context": "work",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "role-mobile",
+      "predicate": "organization",
+      "value": "org-example",
+      "context": "work",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "role-mobile",
+      "predicate": "topic",
+      "value": "mobile",
+      "context": "work",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "role-ai",
+      "predicate": "status",
+      "value": "active",
+      "context": "work",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "role-ai",
+      "predicate": "organization",
+      "value": "org-example",
+      "context": "work",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "role-ai",
+      "predicate": "topic",
+      "value": "ai",
+      "context": "work",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "role-ai",
+      "predicate": "responsibilities",
+      "value": "KI-Entwicklungen bewerten und praktische Erprobung begleiten.",
+      "context": "work",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "me",
+      "predicate": "role",
+      "value": [
+        "role-ai"
+      ],
+      "context": "work",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "mobile",
+      "predicate": "priority",
+      "value": "low",
+      "context": "work",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "ai",
+      "predicate": "priority",
+      "value": "high",
+      "context": "work",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "mobile",
+      "predicate": "priority",
+      "value": "high",
+      "context": "private",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "ai",
+      "predicate": "priority",
+      "value": "high",
+      "context": "private",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "podcasting",
+      "predicate": "status",
+      "value": "active",
+      "context": "hobby",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "podcasting",
+      "predicate": "topic",
+      "value": "ai",
+      "context": "private",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "podcast-project",
+      "predicate": "status",
+      "value": "in_progress",
+      "context": "private",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "podcast-project",
+      "predicate": "topic",
+      "value": "ai",
+      "context": "private",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "podcast-project",
+      "predicate": "related_to",
+      "value": "podcasting",
+      "context": "private",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "podcast-project",
+      "predicate": "next_action",
+      "value": "Nächste Folge vorbereiten.",
+      "context": "private",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    },
+    {
+      "subject": "working-preference",
+      "predicate": "communication",
+      "value": "Konkrete Ergebnisse mit Quellen; offen benennen, was noch nicht umgesetzt oder geprüft wurde.",
+      "context": "general",
+      "origin": "explicit",
+      "confidence": 1,
+      "sources": [
+        "demo-statement"
+      ],
+      "evidence": "Fiktive Testangabe; kein importiertes Benutzerprofil."
+    }
+  ],
+  "signals": []
+}

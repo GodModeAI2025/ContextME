@@ -1,0 +1,394 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ContextMe 1.0 Ingest Batch",
+  "description": "Interchange contract. ContextMe additionally validates source authority, immutable IDs, references, timestamps, privacy and conflicts. No network access is needed to use the runtime.",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "contexts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/context"
+      }
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entity"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/claim"
+      }
+    },
+    "signals": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/signal"
+      }
+    }
+  },
+  "required": [
+    "schema_version"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_.:-]{0,119}$",
+      "maxLength": 120
+    },
+    "timestamp": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "ISO-8601 date or timestamp; timezone-free values are interpreted as UTC. Null means unknown. Runtime checks parsing and temporal consistency."
+    },
+    "unit": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "parent": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "label"
+      ],
+      "additionalProperties": false
+    },
+    "entity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "constraint",
+            "decision",
+            "goal",
+            "hobby",
+            "organization",
+            "person",
+            "preference",
+            "project",
+            "relationship",
+            "resource",
+            "review",
+            "role",
+            "routine",
+            "skill",
+            "task",
+            "tool",
+            "topic",
+            "value"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "maxItems": 50
+        },
+        "sensitive": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "calendar",
+            "chat",
+            "email",
+            "feedback",
+            "file",
+            "import",
+            "interview",
+            "note",
+            "statement",
+            "web"
+          ]
+        },
+        "author": {
+          "enum": [
+            "user",
+            "other",
+            "unknown"
+          ]
+        },
+        "actor": {
+          "enum": [
+            "user",
+            "other",
+            "unknown"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "uri": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "observed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "activity": {
+          "enum": [
+            "create",
+            "edit",
+            "discuss",
+            "save",
+            "read",
+            "passive",
+            "reference"
+          ]
+        },
+        "content_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "canonical_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "claim": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "subject": {
+          "$ref": "#/$defs/id"
+        },
+        "predicate": {
+          "$ref": "#/$defs/id"
+        },
+        "context": {
+          "$ref": "#/$defs/id"
+        },
+        "value": {},
+        "origin": {
+          "enum": [
+            "document",
+            "explicit",
+            "inferred"
+          ]
+        },
+        "confidence": {
+          "$ref": "#/$defs/unit"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "minItems": 1
+        },
+        "evidence": {
+          "type": "string",
+          "maxLength": 600
+        },
+        "locator": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "valid_from": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "valid_to": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "sensitive": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "subject",
+        "predicate",
+        "value",
+        "origin",
+        "confidence",
+        "sources"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "predicate": {
+                "enum": [
+                  "priority",
+                  "pinned_priority",
+                  "interest"
+                ]
+              }
+            },
+            "required": [
+              "predicate"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "anyOf": [
+                  {
+                    "enum": [
+                      "none",
+                      "low",
+                      "medium",
+                      "high"
+                    ]
+                  },
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "predicate": {
+                "const": "pinned_priority"
+              }
+            },
+            "required": [
+              "predicate"
+            ]
+          },
+          "then": {
+            "properties": {
+              "origin": {
+                "const": "explicit"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "signal": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/id"
+        },
+        "context": {
+          "$ref": "#/$defs/id"
+        },
+        "source": {
+          "$ref": "#/$defs/id"
+        },
+        "dimension": {
+          "enum": [
+            "activity",
+            "interest",
+            "importance"
+          ],
+          "default": "activity"
+        },
+        "polarity": {
+          "type": "integer",
+          "enum": [
+            -1,
+            1
+          ],
+          "default": 1
+        },
+        "strength": {
+          "$ref": "#/$defs/unit"
+        },
+        "confidence": {
+          "$ref": "#/$defs/unit"
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 500
+        }
+      },
+      "required": [
+        "subject",
+        "context",
+        "source"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

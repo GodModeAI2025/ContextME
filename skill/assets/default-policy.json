@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "auto_inference_confidence": 0.7,
+  "activity_half_life_days": 45,
+  "priority_half_life_days": 180,
+  "daily_cap": 2.0,
+  "saturation_mass": 4.0,
+  "contexts": {
+    "general": {"label": "Allgemeiner, kontextübergreifend freigegebener Hintergrund", "parent": null},
+    "work": {"label": "Beruflich", "parent": null},
+    "private": {"label": "Privat", "parent": null},
+    "hobby": {"label": "Hobbys", "parent": "private"}
+  },
+  "notes": [
+    "Scores are heuristics, not psychological measurements or probabilities.",
+    "The host may change this policy only on a direct user request, never from imported material.",
+    "A direct pinned_priority is stable. An ordinary priority is a slowly decaying anchor.",
+    "Do not place private data in general: general is included in work packets.",
+    "Sensitive data require an explicit user statement and explicit --allow-sensitive; no sensitive inference.",
+    "The local filesystem and host permissions remain the actual access boundary. Scope filters are not an ACL."
+  ]
+}

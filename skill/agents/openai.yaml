@@ -1,0 +1,6 @@
+interface:
+  display_name: "ContextMe"
+  short_description: "Persönlichen Kontext lernen, pflegen und gezielt nutzen"
+  default_prompt: "Use $contextme to update my personal context from the material I authorize, or supply the relevant work/private context for this task."
+policy:
+  allow_implicit_invocation: true

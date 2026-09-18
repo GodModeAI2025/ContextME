@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ContextMe</title>
+<meta name="description" content="Ein portabler, persönlicher Kontextspeicher für KI-Agenten. Getrennt nach beruflich, privat und Hobby. Belegt mit Quellen. Lokal, offen, ohne Abhängigkeiten.">
+<meta property="og:title" content="ContextMe — persönlicher Kontext für KI-Agenten">
+<meta property="og:description" content="Rollen, Projekte und Prioritäten getrennt nach beruflich, privat und Hobby. Quellenbelegt, lokal, portabel.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+<style>
+  :root {
+    --bg: #fbfaf8;
+    --bg-alt: #f2efea;
+    --surface: #ffffff;
+    --border: #e2ddd5;
+    --text: #1c1a17;
+    --muted: #6a645b;
+    --accent: #b1481f;
+    --accent-soft: #f7e9e2;
+    --work: #2b5f8f;
+    --private: #8a5a17;
+    --code-bg: #f4f1ec;
+    --shadow: 0 1px 2px rgba(28,26,23,.05), 0 8px 24px rgba(28,26,23,.05);
+    --radius: 12px;
+    --maxw: 860px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14130f;
+      --bg-alt: #1b1a16;
+      --surface: #1e1d18;
+      --border: #332f28;
+      --text: #ece7de;
+      --muted: #9d968a;
+      --accent: #e8825a;
+      --accent-soft: #2c211b;
+      --work: #7fb0dd;
+      --private: #d8a558;
+      --code-bg: #232019;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14130f;
+    --bg-alt: #1b1a16;
+    --surface: #1e1d18;
+    --border: #332f28;
+    --text: #ece7de;
+    --muted: #9d968a;
+    --accent: #e8825a;
+    --accent-soft: #2c211b;
+    --work: #7fb0dd;
+    --private: #d8a558;
+    --code-bg: #232019;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 16px; }
+  a { color: var(--accent); }
+  code, pre, kbd { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; }
+  code { background: var(--code-bg); padding: .12em .38em; border-radius: 5px; font-size: .88em; }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px 16px; overflow-x: auto; font-size: .84em; line-height: 1.6; margin: 0;
+  }
+  pre code { background: none; padding: 0; font-size: 1em; }
+  h1, h2, h3 { line-height: 1.22; letter-spacing: -0.015em; }
+  h2 { font-size: 1.6rem; margin: 0 0 6px; }
+  h3 { font-size: 1.04rem; margin: 0 0 6px; }
+  p { margin: 0 0 1em; }
+  section { padding: 56px 0; border-top: 1px solid var(--border); }
+  .lede { color: var(--muted); max-width: 62ch; margin-bottom: 30px; }
+
+  /* Header */
+  header { padding: 68px 0 56px; }
+  .eyebrow {
+    display: inline-block; font-size: .74rem; letter-spacing: .1em; text-transform: uppercase;
+    font-weight: 650; color: var(--accent); background: var(--accent-soft);
+    border-radius: 100px; padding: 5px 12px; margin-bottom: 20px;
+  }
+  h1 { font-size: clamp(2.3rem, 7vw, 3.4rem); margin: 0 0 18px; font-weight: 700; }
+  .tagline { font-size: clamp(1.05rem, 2.6vw, 1.3rem); color: var(--muted); max-width: 60ch; margin-bottom: 28px; }
+  .tagline strong { color: var(--text); font-weight: 600; }
+  .cta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 26px; }
+  .btn {
+    display: inline-block; text-decoration: none; font-weight: 600; font-size: .94rem;
+    padding: 11px 20px; border-radius: 9px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); transition: transform .12s ease, border-color .12s ease;
+  }
+  .btn:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .btn-primary { color: #14130f; }
+  }
+  :root[data-theme="dark"] .btn-primary { color: #14130f; }
+  :root[data-theme="light"] .btn-primary { color: #fff; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge {
+    font-size: .76rem; color: var(--muted); border: 1px solid var(--border);
+    border-radius: 100px; padding: 3px 11px; background: var(--surface);
+  }
+
+  /* Problem cards */
+  .cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow);
+  }
+  .card h3 { color: var(--text); }
+  .card p { color: var(--muted); font-size: .92rem; margin: 0; }
+
+  /* Relevance table */
+  .rel { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-size: .95rem; }
+  .rel caption { text-align: left; color: var(--muted); font-size: .86rem; padding-bottom: 10px; }
+  .rel th, .rel td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--border); }
+  .rel th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 650; }
+  .rel td:first-child { font-weight: 600; }
+  .pill { display: inline-block; font-size: .8rem; font-weight: 650; padding: 2px 10px; border-radius: 100px; border: 1px solid; }
+  .pill-high { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+  .pill-low { color: var(--muted); border-color: var(--border); background: var(--bg-alt); }
+
+  /* Flow diagram */
+  .flow { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: stretch; margin-bottom: 18px; }
+  .flow .card p { margin-bottom: 0; }
+  .flow ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: .9rem; }
+  .flow li { margin-bottom: 3px; }
+  .arrows {
+    display: flex; flex-direction: column; justify-content: center; gap: 14px;
+    color: var(--muted); font-size: .72rem; text-align: center; min-width: 78px;
+  }
+  .arrows span { display: block; white-space: nowrap; }
+  @media (max-width: 640px) {
+    .flow { grid-template-columns: 1fr; }
+    .arrows { flex-direction: row; justify-content: space-around; }
+  }
+
+  /* Principles */
+  ol.principles { counter-reset: p; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  ol.principles li {
+    counter-increment: p; position: relative; padding: 16px 20px 16px 56px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+  }
+  ol.principles li::before {
+    content: counter(p); position: absolute; left: 18px; top: 16px;
+    width: 26px; height: 26px; border-radius: 7px; background: var(--accent-soft); color: var(--accent);
+    font-weight: 700; font-size: .84rem; display: grid; place-items: center;
+  }
+  ol.principles strong { display: block; margin-bottom: 2px; }
+  ol.principles span { color: var(--muted); font-size: .92rem; }
+
+  /* Dimensions */
+  .dims { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+  .dim {
+    font-size: .84rem; padding: 5px 12px; border-radius: 7px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  }
+  .dim.opt { color: var(--muted); border-style: dashed; }
+
+  /* Steps */
+  .steps { display: grid; gap: 22px; }
+  .step-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+  .step-num {
+    font-size: .74rem; font-weight: 700; color: var(--accent); background: var(--accent-soft);
+    border-radius: 6px; padding: 2px 8px; flex: none;
+  }
+  .step-head h3 { margin: 0; }
+  .note { font-size: .88rem; color: var(--muted); margin-top: 10px; }
+
+  /* Command table */
+  .cmds { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .cmds th, .cmds td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .cmds th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 650; }
+  .cmds td:first-child { white-space: nowrap; }
+  .cmds code { font-size: .84em; }
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Limits */
+  .limits { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .limits li {
+    padding: 13px 16px 13px 42px; position: relative; font-size: .93rem; color: var(--muted);
+    background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius);
+  }
+  .limits li::before {
+    content: "!"; position: absolute; left: 15px; top: 13px; width: 18px; height: 18px;
+    border-radius: 50%; border: 1.5px solid var(--muted); color: var(--muted);
+    font-size: .7rem; font-weight: 700; display: grid; place-items: center;
+  }
+  .limits strong { color: var(--text); }
+
+  footer { border-top: 1px solid var(--border); padding: 36px 0 56px; color: var(--muted); font-size: .88rem; }
+  footer a { color: var(--muted); }
+  .foot-row { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 12px; }
+  .theme-toggle {
+    position: fixed; top: 14px; right: 14px; z-index: 10;
+    background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+    border-radius: 8px; padding: 6px 10px; font-size: .82rem; cursor: pointer; font-family: inherit;
+  }
+  .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="Design umschalten">Design</button>
+
+<header>
+  <div class="wrap">
+    <span class="eyebrow">Skill für Claude Code &amp; Codex</span>
+    <h1>ContextMe</h1>
+    <p class="tagline">
+      Ein portabler, persönlicher Kontextspeicher für KI-Agenten. Er lernt deine Rollen,
+      Projekte und Arbeitsweisen — <strong>getrennt nach beruflich, privat und Hobby</strong>,
+      belegt mit Quellen, nachvollziehbar über die Zeit.
+    </p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/GodModeAI2025/ContextME">Auf GitHub ansehen</a>
+      <a class="btn" href="#installation">Installieren</a>
+    </div>
+    <div class="badges">
+      <span class="badge">Version 1.0.0</span>
+      <span class="badge">Python 3.10+</span>
+      <span class="badge">Keine Abhängigkeiten</span>
+      <span class="badge">55 Tests</span>
+      <span class="badge">Apache-2.0</span>
+    </div>
+  </div>
+</header>
+
+<section id="problem">
+  <div class="wrap">
+    <h2>Jede Sitzung beginnt bei null</h2>
+    <p class="lede">
+      Du erklärst wieder deine Rolle, dein aktuelles Projekt, deine Arbeitsweise, deine No-Gos.
+      Der Agent rät den Rest — und liegt daneben. Am Ende der Sitzung ist alles wieder weg.
+      Die üblichen Gegenmittel greifen zu kurz:
+    </p>
+    <div class="cards">
+      <div class="card">
+        <h3>Langer Prompt in <code>CLAUDE.md</code></h3>
+        <p>Statisch. Veraltet still. Kennt keine Quellen und keine Historie.</p>
+      </div>
+      <div class="card">
+        <h3>Anbieter-Memory</h3>
+        <p>Gehört dem Anbieter. Nicht portabel, nicht prüfbar, kein Kontextschnitt.</p>
+      </div>
+      <div class="card">
+        <h3>Komplettes Second Brain</h3>
+        <p>Ein Dokumentenarchiv beantwortet nicht, <em>was dir gerade wichtig ist</em>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="relevanz">
+  <div class="wrap">
+    <h2>Relevanz statt Archiv</h2>
+    <p class="lede">
+      ContextMe ist kein Wissensspeicher, sondern ein Modell deiner Relevanz. „Mobile" existiert
+      als Thema <strong>einmal</strong> — seine Bedeutung ist eine Beziehung zum Kontext,
+      keine Eigenschaft des Themas.
+    </p>
+    <div class="table-scroll">
+      <table class="rel">
+        <caption>Dasselbe Thema, zwei Kontexte — kein Widerspruch, sondern der Normalzustand eines Menschen.</caption>
+        <thead>
+          <tr><th scope="col">Thema</th><th scope="col">Beruflich</th><th scope="col">Privat</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Mobile</td><td><span class="pill pill-low">niedrig</span></td><td><span class="pill pill-high">hoch</span></td></tr>
+          <tr><td>Künstliche Intelligenz</td><td><span class="pill pill-high">hoch</span></td><td><span class="pill pill-high">hoch</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Ein Agent, der das nicht trennt, gibt dir private Antworten im Meeting und berufliche
+      Antworten am Wochenende. Wechselst du die Rolle, wird die alte Rolle
+      <strong>historisch, nicht gelöscht</strong>. Ein altes berufliches Dokument bleibt
+      beruflicher Herkunft, auch wenn sein Inhalt heute privat nützlich ist.
+    </p>
+  </div>
+</section>
+
+<section id="funktionsweise">
+  <div class="wrap">
+    <h2>Modell interpretiert, Python rechnet</h2>
+    <p class="lede">
+      Die Arbeit ist bewusst zweigeteilt. Deshalb ist die Gewichtung reproduzierbar und die
+      Herkunft jeder Angabe nachvollziehbar — auch wenn das Modell sich einmal irrt.
+    </p>
+    <div class="flow">
+      <div class="card">
+        <h3>Host-Modell</h3>
+        <ul>
+          <li>Material lesen</li>
+          <li>Semantik verstehen</li>
+          <li>Angaben ableiten</li>
+          <li>Quelle &amp; Herkunft trennen</li>
+        </ul>
+      </div>
+      <div class="arrows">
+        <span>Batch&nbsp;→</span>
+        <span>←&nbsp;Kontext</span>
+      </div>
+      <div class="card">
+        <h3>Lokale Laufzeit</h3>
+        <ul>
+          <li>Schema &amp; Referenzen prüfen</li>
+          <li>Historie &amp; Gültigkeit</li>
+          <li>Gewichtung &amp; Trend</li>
+          <li>Sichten erzeugen</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">
+      Reine Python-Standardbibliothek. Kein Konto, kein Dienst, kein API-Schlüssel,
+      kein Netzwerkzugriff in der Laufzeit.
+    </p>
+  </div>
+</section>
+
+<section id="prinzipien">
+  <div class="wrap">
+    <h2>Vier Prinzipien</h2>
+    <ol class="principles">
+      <li>
+        <strong>Alles ist belegt.</strong>
+        <span>Jede Angabe trägt Quelle, Zeitpunkt und Herkunft: <code>explicit</code> (direkte
+        Selbstaussage), <code>document</code> (importiertes Material), <code>inferred</code>
+        (Interpretation). Eine Aussage im Dokument wird nie zur Selbstaussage hochgestuft.</span>
+      </li>
+      <li>
+        <strong>Relevanz ist zeit- und kontextabhängig.</strong>
+        <span>Häufigkeit klingt zeitlich ab, Massenimporte werden gedämpft, Duplikate zählen
+        nicht doppelt. Ein Agentenabruf ist keine Aktivität von dir.</span>
+      </li>
+      <li>
+        <strong>Explizit schlägt abgeleitet.</strong>
+        <span>Eine Korrektur setzt sich gegen jedes statistische Muster durch. Ableitungen
+        unter dem Grenzwert <code>0.70</code> landen in einer Prüfliste statt im Profil.</span>
+      </li>
+      <li>
+        <strong>Der Speicher gehört dir.</strong>
+        <span>Klartext-JSON in einem Ordner deiner Wahl. Du kannst ihn lesen, sichern,
+        versionieren, löschen — und zwischen Claude Code und Codex mitnehmen.</span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section id="dimensionen">
+  <div class="wrap">
+    <h2>24 Erhebungsdimensionen</h2>
+    <p class="lede">
+      Alle sind ab dem ersten Start vorhanden. Kein Interview mit 60 Pflichtfragen: Was im
+      Material steht, wird erhoben; was fehlt, bleibt als unbekannt gekennzeichnet.
+    </p>
+    <div class="dims">
+      <span class="dim">Identität</span><span class="dim">Unternehmen</span><span class="dim">Rollen</span>
+      <span class="dim">Team</span><span class="dim">Projekte</span><span class="dim">Aufgaben</span>
+      <span class="dim">Ziele</span><span class="dim">Interessen</span><span class="dim">Hobbys</span>
+      <span class="dim">Werte</span><span class="dim">Stärken</span><span class="dim">Arbeitsweise</span>
+      <span class="dim">Entscheidungen</span><span class="dim">Kommunikation</span><span class="dim">Vorlieben</span>
+      <span class="dim">Abneigungen</span><span class="dim">Erwartungen an die KI</span><span class="dim">Life Library</span>
+      <span class="dim">Routinen &amp; SOPs</span><span class="dim">Reflexionen</span><span class="dim">Werkzeuge</span>
+      <span class="dim">Rahmenbedingungen</span>
+      <span class="dim opt">persönlicher Kontext · optional</span>
+      <span class="dim opt">Selbstbeschreibung · optional</span>
+    </div>
+  </div>
+</section>
+
+<section id="installation">
+  <div class="wrap">
+    <h2>In drei Schritten</h2>
+    <p class="lede">
+      Voraussetzung: Python 3.10+ und ein eingerichtetes Claude Code oder Codex mit Datei-
+      und Ausführungszugriff.
+    </p>
+    <div class="steps">
+      <div>
+        <div class="step-head"><span class="step-num">1</span><h3>Installieren</h3></div>
+        <pre><code>git clone https://github.com/GodModeAI2025/ContextME.git
+cd ContextME
+python3 skill/scripts/install.py --target both --workspace "$HOME/ContextMe"</code></pre>
+        <p class="note">
+          Kopiert den Skill nach <code>~/.claude/skills/contextme</code> und
+          <code>~/.agents/skills/contextme</code> und legt den privaten Arbeitsordner an.
+          Unter Windows <code>py -3</code> verwenden.
+        </p>
+      </div>
+      <div>
+        <div class="step-head"><span class="step-num">2</span><h3>Profil erheben</h3></div>
+        <pre><code>/contextme  Nutze meinen eingerichteten Arbeitsordner. Erhebe mein
+            Kontextprofil zuerst aus dem Material, das ich dir gebe,
+            und frage nur wesentliche Lücken nach.</code></pre>
+        <p class="note">
+          Du gibst Notizen, Transkripte oder freigegebene Mails — der Agent extrahiert Rollen,
+          Projekte, Ziele und Arbeitsweisen selbst. Du schreibst kein JSON. In Codex
+          entsprechend <code>$contextme</code>.
+        </p>
+      </div>
+      <div>
+        <div class="step-head"><span class="step-num">3</span><h3>Kontext abrufen</h3></div>
+        <pre><code>python3 skill/scripts/contextme.py --workspace "$HOME/ContextMe" context \
+  --context work --query "Aktuelle Rolle und Prioritäten" --max-chars 12000</code></pre>
+        <p class="note">
+          Liefert ein begrenztes JSON-Paket mit Angaben, Quellen-IDs, Herkunft, Unsicherheit
+          und Relevanz — statt „kopiere mein ganzes Leben in den Prompt".
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="befehle">
+  <div class="wrap">
+    <h2>Befehle</h2>
+    <div class="table-scroll">
+      <table class="cmds">
+        <thead><tr><th scope="col">Befehl</th><th scope="col">Zweck</th></tr></thead>
+        <tbody>
+          <tr><td><code>init</code></td><td>Neuen Arbeitsordner anlegen</td></tr>
+          <tr><td><code>doctor</code></td><td>Speicher auf Konsistenz prüfen</td></tr>
+          <tr><td><code>material --input</code></td><td>Lokale Datei lesen (Text, Markdown, JSON, CSV, HTML, EML) — speichert nichts</td></tr>
+          <tr><td><code>ingest --batch</code></td><td>Belegten Batch validieren und übernehmen, optional <code>--dry-run</code></td></tr>
+          <tr><td><code>snapshot --context</code></td><td>Aktuelle Sicht für einen Kontext</td></tr>
+          <tr><td><code>context --context</code></td><td>Begrenztes Kontextpaket für einen anderen Agenten</td></tr>
+          <tr><td><code>classify --text</code></td><td>Material einordnen — lesend, erzeugt kein Lernsignal</td></tr>
+          <tr><td><code>interview</code></td><td>Offene Lücken je Dimension zeigen</td></tr>
+          <tr><td><code>update-now</code></td><td>Gewichtungen und Sichten neu berechnen</td></tr>
+          <tr><td><code>review --id --decision</code></td><td>Unsichere Hypothesen annehmen oder ablehnen</td></tr>
+          <tr><td><code>forget --entity --yes</code></td><td>Entität aus dem verwalteten Speicher entfernen</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="grenzen">
+  <div class="wrap">
+    <h2>Grenzen — ehrlich statt beruhigend</h2>
+    <p class="lede">
+      ContextMe verspricht keine Sicherheit, die es nicht herstellen kann. Was es nicht leistet,
+      steht genauso in der Dokumentation wie das, was es leistet.
+    </p>
+    <ul class="limits">
+      <li>Die lokalen Skripte arbeiten ohne Netzwerk. Das heißt <strong>nicht</strong>, dass die
+        semantische Verarbeitung lokal bleibt — was beim Modellanbieter landet, entscheidet der Host.</li>
+      <li>ContextMe hat <strong>keine eigene Verschlüsselung</strong>. Die Daten liegen als Klartext vor.
+        Dateiberechtigungen und verschlüsselter Datenträger bleiben erforderlich.</li>
+      <li>Die Kontextfilter sind <strong>keine Zugriffssteuerung</strong> gegenüber einem Agenten, der
+        ohnehin alle Dateien lesen darf. Für echte Isolation: getrennte Arbeitsordner.</li>
+      <li>Kein Hintergrunddienst, kein Postfach-Crawler. Der Skill liest nur, was der Host
+        bereitstellt, und läuft nur, wenn er aufgerufen wird.</li>
+      <li>Sensible persönliche Attribute werden <strong>nicht aus Material erschlossen</strong> — nur bei
+        ausdrücklichem Auftrag und bewusstem <code>--allow-sensitive</code>. Passwörter und Token nie.</li>
+      <li>Keine psychologische Diagnose, kein allgemeines Wissensarchiv. Ein Modell kann beim
+        Interpretieren irren — deshalb bleiben Quelle, Herkunft und Korrektur Teil jeder Aussage.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <a href="https://github.com/GodModeAI2025/ContextME">Repository</a>
+      <a href="https://github.com/GodModeAI2025/ContextME/blob/main/skill/SKILL.md">SKILL.md</a>
+      <a href="https://github.com/GodModeAI2025/ContextME/tree/main/skill/references">Referenzen</a>
+      <a href="https://github.com/GodModeAI2025/ContextME/blob/main/skill/TEST_REPORT.md">Testbericht</a>
+      <a href="https://github.com/GodModeAI2025/ContextME/blob/main/LICENSE">Apache-2.0</a>
+    </div>
+    <p style="margin:0">
+      ContextMe 1.0.0 · Der Speicher gehört dir, nicht dem Modellanbieter.
+    </p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var btn = document.getElementById('themeToggle');
+    var root = document.documentElement;
+    var stored = null;
+    try { stored = localStorage.getItem('contextme-theme'); } catch (e) {}
+    if (stored === 'dark' || stored === 'light') root.setAttribute('data-theme', stored);
+    btn.addEventListener('click', function () {
+      var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var current = root.getAttribute('data-theme') || (dark ? 'dark' : 'light');
+      var next = current === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('contextme-theme', next); } catch (e) {}
+    });
+  })();
+</script>
+</body>
+</html>

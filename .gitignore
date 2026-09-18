@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Der persönliche Kontextspeicher gehört NIE in dieses Repository.
+.contextme/
+contextme-demo/
+ContextMe/
+workspace/
+**/state/events.json
