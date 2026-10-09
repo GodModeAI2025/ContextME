@@ -244,6 +244,23 @@ Für dauerhaftes Mitlaufen enthält
 [`skill/references/INTEGRATION.md`](skill/references/INTEGRATION.md) einen
 Regelblock für `CLAUDE.md` / `AGENTS.md`.
 
+## Tägliche Nutzung und Speicherort
+
+Den Speicher mit `python3 "<SKILL_DIR>/scripts/contextme.py" where` finden.
+`NOW.md` zeigt aktuelle Prioritäten, `INDEX.md` erschließt die Objektseiten.
+Der vollständige Ablauf zum Lesen, Prüfen, Korrigieren und Nachverfolgen von Quellen
+steht in [Den Kontextspeicher täglich nutzen](skill/references/DAILY_USE.md).
+
+Vor der ersten Initialisierung einen Datenpfad ausdrücklich wählen oder bestätigen.
+Lokale Vorschläge sind `~/Library/Application Support/ContextMe` auf macOS,
+`~/.local/share/contextme` auf Linux und `%LOCALAPPDATA%\ContextMe` auf Windows.
+Eigene Synchronisierung und Unternehmensvorgaben prüfen; es gibt keine automatische
+Auswahl. `init` und Installation nennen den tatsächlichen Pfad sowie Lese-Einstiege.
+
+`show <CLAIM-ID>` liefert Herkunft, vollständige Quellen und letzten Prüfentscheid.
+Der Importbericht nennt einzelne Duplikate und ungenutzte Quellen. Material,
+das der Host vor dem Import auslässt, muss der Host selbst mit Grund ausweisen.
+
 ## Grenzen und Datenschutz
 
 Ehrlich statt beruhigend:
@@ -272,7 +289,7 @@ Details: [`skill/references/PRIVACY.md`](skill/references/PRIVACY.md).
 python3 -m unittest discover -s skill/tests
 ```
 
-55 lokale Tests prüfen getrennte berufliche/private Relevanz, historische Rollen,
+64 lokale Tests prüfen getrennte berufliche/private Relevanz, historische Rollen,
 Abklingen, Korrekturen, fixierte Prioritäten, Quellenzeit und Gültigkeit,
 Duplikatvermeidung, Tagesdämpfung, Urheber/Handelnder, unsichere und abgelehnte
 Hypothesen, kontextbegrenzte Ausgabe, explizite sensible Angaben, Vergessen,
@@ -296,7 +313,7 @@ skill/                     Der Skill — unverändert installierbar
 │                          Integration, Datenschutz, Abnahme, Quellen
 ├── assets/                Batch-Schema, Standard-Policy, Taxonomie
 ├── examples/              Fiktive Demo-Daten
-├── tests/                 55 Tests
+├── tests/                 64 Tests
 └── MANIFEST.sha256.json   Integritätsliste aller Skill-Dateien
 ```
 

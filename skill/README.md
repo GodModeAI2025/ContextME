@@ -116,6 +116,22 @@ Das feste Datum macht die Demo reproduzierbar. Im Alltag `--at` weglassen.
 
 ## Arbeitsverzeichnis
 
+Vor der ersten Initialisierung einen Datenpfad bewusst wählen. Empfohlene lokale
+Vorschläge: macOS `~/Library/Application Support/ContextMe`, Linux
+`~/.local/share/contextme`, Windows `%LOCALAPPDATA%\ContextMe`. Eigene Sync-Regeln
+und Unternehmensvorgaben prüfen. Ein Agent muss den gewählten Pfad nennen oder
+bestätigen lassen, bevor er einen neuen Speicher initialisiert. Die obigen
+`$HOME/ContextMe`-Beispiele gelten nur für einen bewusst gewählten, passenden Pfad.
+
+`python3 contextme/scripts/contextme.py where` zeigt den ausgewählten absoluten
+Pfad, seine Herkunft und die Lese-Einstiege. Installation und `init` liefern
+dieselben Lese-Einstiege im Feld `read_next`.
+
+Für tägliches Lesen, Importprüfung, Korrektur und Quellenprüfung siehe
+[DAILY_USE.md](references/DAILY_USE.md). `show <CLAIM-ID>` macht die vollständigen
+Quellen einer Aussage abrufbar; `ingest.items` macht einzelne Duplikate und
+ungenutzte Quellen nachvollziehbar.
+
 ```text
 ContextMe/
 ├── policy.json                    # Einstellbare Gewichtungsregeln und Kontexte
