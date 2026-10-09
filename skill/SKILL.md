@@ -33,10 +33,19 @@ Voraussetzung: Python 3.10 oder neuer. Unter Windows den verfügbaren Python-Auf
 verwenden, beispielsweise `py -3`. Keine Pakete müssen installiert werden.
 
 Arbeitsverzeichnis in dieser Reihenfolge bestimmen: expliziter Pfad der Anfrage,
-`CONTEXTME_WORKSPACE`, dann `~/.contextme/location.json`. Fehlt es, stelle **eine**
-gezielte Frage nach dem Speicherort. Wähle keinen versteckten Unternehmensordner,
-kein öffentliches Repository und keinen automatisch synchronisierten Cloud-Ordner.
-Bei einem neuen, vom Benutzer gewählten Speicher `init` ausführen.
+`CONTEXTME_WORKSPACE`, dann `~/.contextme/location.json`. Mit `where` den tatsächlich
+gewählten Pfad und seine Herkunft anzeigen. Fehlt ein Speicherort, **kein `init`
+und keine Installation mit `--workspace` ausführen, bevor der Benutzer einen Pfad
+genannt oder bestätigt hat**. Stelle dafür eine gezielte Frage und schlage einen
+hostlokalen Standard vor: macOS `~/Library/Application Support/ContextMe`, Linux
+`~/.local/share/contextme`, Windows `%LOCALAPPDATA%\ContextMe`. Diese Pfade sind
+Vorschläge, keine automatische Auswahl oder Garantie gegen konfigurierte Synchronisierung.
+Prüfe Unternehmensvorgaben und den tatsächlichen Sync-Status. Wähle keinen
+versteckten Unternehmensordner, kein öffentliches Repository und keinen automatisch
+synchronisierten Cloud-Ordner. Ein bereits ausdrücklich gewählter Pfad braucht
+keine erneute Bestätigung. Bei einem neuen, gewählten Speicher `init` ausführen.
+Nach `init`/Installation den absoluten Pfad sowie `NOW.md`, `INDEX.md` und `views/`
+als Lese-Einstiege nennen; diese stehen auch in `read_next` der CLI-Ausgabe.
 
 ## 2. Eingänge und Betriebsarten
 
@@ -212,6 +221,14 @@ mehrere Verbindungen bekommen. Relevanz ist kein Wahrheitsurteil über das Mater
 `classify` schreibt selbst keine Lernsignale und verschiebt keine Originale.
 
 ## 8. Interview, Aktualisierung und Korrektur
+
+Für den täglichen Lese-, Prüf- und Korrekturablauf lies
+[DAILY_USE.md](references/DAILY_USE.md). `show <CLAIM-ID>` liefert die Aussage,
+vollständige Quellen einschließlich URI/Canonical-ID und den letzten Prüfentscheid.
+`ingest` berichtet in `items` einzelne neue/duplizierte Datensätze und ungenutzte
+Quellen. `skipped_sensitive` nennt bewusst ausgelassene sensible Angaben ohne Werte.
+Auch vor dem Import ausgelassenes Material im Host-Bericht mit Grund nennen:
+Die Laufzeit kann Inhalte, die sie nie erhalten hat, nicht nachträglich rekonstruieren.
 
 ```sh
 python3 "<SKILL_DIR>/scripts/contextme.py" --workspace "<WORKSPACE>" interview

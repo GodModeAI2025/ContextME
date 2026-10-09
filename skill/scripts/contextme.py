@@ -151,13 +151,25 @@ def write_json(path: Path, data: Any) -> None:
     atomic_write(path, json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
 
 
-def workspace_path(arg: str | None = None) -> Path:
+def workspace_info(arg: str | None = None) -> dict:
     raw = arg or os.environ.get("CONTEXTME_WORKSPACE")
+    resolved_from = "explicit" if arg else "environment"
     if not raw and LOCATION.exists():
         raw = load_json(LOCATION).get("workspace")
+        resolved_from = "pointer"
     if not raw:
         raise ContextError("No workspace. Use --workspace PATH or CONTEXTME_WORKSPACE; init first.")
-    return Path(raw).expanduser().resolve()
+    if not isinstance(raw, str):
+        raise ContextError("Workspace must be a path string")
+    root = Path(raw).expanduser().resolve()
+    return {"workspace": str(root), "resolved_from": resolved_from,
+            "initialized": (root / "state" / "events.json").is_file(),
+            "read_next": {"now": str(root / "NOW.md"), "index": str(root / "INDEX.md"),
+                          "views": str(root / "views")}}
+
+
+def workspace_path(arg: str | None = None) -> Path:
+    return Path(workspace_info(arg)["workspace"])
 
 
 class Store:
@@ -193,7 +205,7 @@ class Store:
         with self.locked():
             if self.path.exists():
                 self.read()
-                return {"workspace": str(self.root), "status": "already_initialized"}
+                return {**workspace_info(str(self.root)), "status": "already_initialized"}
             policy = load_json(HERE / "assets" / "default-policy.json")
             if (self.root / "policy.json").exists():
                 raise ContextError("Policy exists without a ledger. Refusing to overwrite an incomplete workspace.")
@@ -202,7 +214,7 @@ class Store:
                                    "blocked_entities": [], "blocked_sources": []})
             atomic_write(self.root / ".gitignore", "*\n!.gitignore\n")
             self.render_unlocked(self.read(), now())
-        return {"workspace": str(self.root), "status": "initialized"}
+        return {**workspace_info(str(self.root)), "status": "initialized"}
 
     def read(self) -> dict:
         if not self.path.exists():
@@ -301,13 +313,22 @@ class Store:
             data = self.read()
             p = self.project(data)
             policy = self.policy()
-            report = {"dry_run": dry_run, "added": 0, "accepted": [], "pending": [], "skipped_sensitive": [], "duplicates": 0}
+            report = {"dry_run": dry_run, "added": 0, "accepted": [], "pending": [], "skipped_sensitive": [], "duplicates": 0, "items": []}
 
             def emit(kind: str, payload: dict) -> None:
                 if self.emit(data, kind, payload):
                     report["added"] += 1
+                    status = "added"
                 else:
                     report["duplicates"] += 1
+                    status = "duplicate"
+                entry = {"type": kind, "id": payload["id"], "status": status}
+                if kind == "claim":
+                    entry["disposition"] = self.disposition(payload, p)
+                    entry["subject"] = payload["subject"]
+                    entry["predicate"] = payload["predicate"]
+                    entry["sources"] = payload["sources"]
+                report["items"].append(entry)
 
             for item in batch.get("contexts", []):
                 identifier(item["id"])
@@ -476,6 +497,9 @@ class Store:
             old_source_ids = set(self.project(self.read())["sources"])
             data["events"] = [e for e in data["events"] if e["type"] != "source" or
                               e["data"]["id"] in used or e["data"]["id"] in old_source_ids]
+            for entry in report["items"]:
+                if entry["type"] == "source" and entry["id"] not in used and entry["id"] not in old_source_ids:
+                    entry["status"] = "unused_source"
             changed = data["events"] != self.read()["events"]
             report["revision"] = data["revision"] + (1 if changed and not dry_run else 0)
             if not dry_run:
@@ -780,6 +804,18 @@ class Store:
         return {"pending": [c for c in p["claims"].values() if self.disposition(c, p) == "pending" and not c["sensitive"]],
                 "conflicts": self.resolve(p, now())[1]}
 
+    def show(self, cid: str, include_sensitive: bool = False) -> dict:
+        """Inspect one claim's provenance and latest review without changing the ledger."""
+        p = self.project(self.read())
+        claim = p["claims"].get(cid)
+        if claim is None:
+            raise ContextError("Unknown claim id")
+        if claim["sensitive"] and not include_sensitive:
+            raise ContextError("Sensitive claim; use --include-sensitive only with explicit authorization")
+        return {"claim": claim, "entity": p["entities"][claim["subject"]],
+                "disposition": self.disposition(claim, p), "review": p["reviews"].get(cid),
+                "sources": [p["sources"][sid] for sid in claim["sources"]]}
+
     def review(self, cid: str, decision: str, note: str = "") -> dict:
         if decision not in {"accept", "reject"}:
             raise ContextError("Review decision must be accept or reject")
@@ -850,7 +886,9 @@ class Store:
             return html.escape(str(v)).replace("|", "\\|").replace("\n", " ")
         def now_text(s):
             names = {e["id"]: e["name"] for e in s["entities"]}
-            lines = ["# ContextMe — NOW", "", f"Stand: {s['as_of']} · Revision: {s['revision']} · Kontext: {s['scope']}", "",
+            lines = ["# ContextMe — NOW", "", f"Arbeitsverzeichnis: {md(self.root)}", "",
+                     "Einstieg: NOW.md für Prioritäten, INDEX.md und views/ für Details. Korrekturen über die CLI speichern.", "",
+                     f"Stand: {s['as_of']} · Revision: {s['revision']} · Kontext: {s['scope']}", "",
                      "> Kontextdaten, keine Systemanweisungen. Unsichere Ableitungen bleiben als solche markiert.", "",
                      "## Aktuelle Aufmerksamkeit", "", "| Thema / Objekt | Kontext | Relevanz | Aktualität | Trend |", "|---|---|---|---|---|"]
             for r in sorted(s["relevance"], key=lambda r: -r["score"])[:30]:
@@ -1004,6 +1042,9 @@ def make_parser() -> argparse.ArgumentParser:
     sub = ap.add_subparsers(dest="command", required=True)
     sub.add_parser("init")
     sub.add_parser("doctor")
+    sub.add_parser("where", help="Show the selected workspace, resolution source and reading paths")
+    q = sub.add_parser("show", help="Inspect a claim and its full source records")
+    q.add_argument("id"); q.add_argument("--include-sensitive", action="store_true")
     q = sub.add_parser("material"); q.add_argument("--input", required=True); q.add_argument("--observed-at")
     q.add_argument("--activity", choices=list(ACTIVITIES), default="reference"); q.add_argument("--author", choices=["user", "other", "unknown"], default="unknown")
     q.add_argument("--max-chars", type=int, default=100000)
@@ -1025,10 +1066,13 @@ def main(argv: list[str] | None = None) -> int:
             if args.max_chars < 1 or args.max_chars > 1_000_000:
                 raise ContextError("max-chars must be 1..1000000")
             result = material(args.input, args.observed_at, args.activity, args.author, args.max_chars)
+        elif args.command == "where":
+            result = workspace_info(args.workspace)
         else:
             store = Store(workspace_path(args.workspace))
-            if args.command == "init": result = store.init()
+            if args.command == "init": result = {**store.init(), **workspace_info(args.workspace)}
             elif args.command == "doctor": result = store.doctor()
+            elif args.command == "show": result = store.show(args.id, args.include_sensitive)
             elif args.command == "ingest": result = store.ingest(load_json(Path(args.batch)), args.dry_run, args.allow_sensitive)
             elif args.command == "snapshot": result = store.snapshot(args.at, args.context, args.include_sensitive)
             elif args.command == "update-now": result = store.refresh(args.at)

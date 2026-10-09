@@ -9,11 +9,16 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import contextlib
+import io
+import os
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from contextme import Store, ContextError, canonical, material, load_json, timestamp, now
 from install import install
+import contextme
 
 AT = "2026-09-17T12:00:00Z"
 OLD = "2026-08-01T12:00:00Z"
@@ -52,6 +57,73 @@ class ContextTests(unittest.TestCase):
         original = self.s.read()
         self.s.init()
         self.assertEqual(original, self.s.read())
+    def test_workspace_discovery_reports_precedence_without_writing(self):
+        pointer = Path(self.tmp.name) / "location.json"
+        pointer.write_text(json.dumps({"workspace": str(self.root)}))
+        before = self.s.read()
+        with patch.object(contextme, "LOCATION", pointer), patch.dict(os.environ, {"CONTEXTME_WORKSPACE": str(self.root / "env")}):
+            self.assertEqual(contextme.workspace_info(str(self.root))["resolved_from"], "explicit")
+            self.assertEqual(contextme.workspace_info()["resolved_from"], "environment")
+        with patch.object(contextme, "LOCATION", pointer), patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(contextme.workspace_info()["resolved_from"], "pointer")
+        self.assertEqual(before, self.s.read())
+    def test_init_and_generated_now_explain_where_to_read(self):
+        result = self.s.init()
+        self.assertEqual(result["read_next"]["now"], str(self.root.resolve() / "NOW.md"))
+        self.assertIn(str(self.root.resolve()), (self.root / "NOW.md").read_text())
+    def test_show_claim_returns_sources_and_review_without_writing(self):
+        b = batch()
+        b["sources"][0].update(uri="mail://test-message", canonical_id="message-1", title="Test")
+        cid = self.s.ingest(b)["accepted"][0]
+        self.s.review(cid, "reject", "Incorrect")
+        before = self.s.read()
+        result = self.s.show(cid)
+        self.assertEqual(result["disposition"], "rejected")
+        self.assertEqual(result["sources"][0]["canonical_id"], "message-1")
+        self.assertEqual(result["sources"][0]["uri"], "mail://test-message")
+        self.assertEqual(result["review"]["note"], "Incorrect")
+        self.assertEqual(before, self.s.read())
+        with self.assertRaises(ContextError): self.s.show("missing")
+    def test_show_sensitive_claim_requires_explicit_opt_in(self):
+        b = batch(predicate="health")
+        cid = self.s.ingest(b, allow_sensitive=True)["accepted"][0]
+        with self.assertRaises(ContextError): self.s.show(cid)
+        self.assertEqual(self.s.show(cid, include_sensitive=True)["claim"]["id"], cid)
+    def test_ingest_reports_duplicates_pending_and_unused_sources(self):
+        b = batch(origin="inferred", confidence=.3)
+        first = self.s.ingest(b)
+        cid = first["pending"][0]
+        self.s.review(cid, "reject")
+        b["sources"].append({"id": "unused", "kind": "note"})
+        result = self.s.ingest(b)
+        items = {(i["type"], i["id"]): i for i in result["items"]}
+        self.assertEqual(items[("claim", cid)]["status"], "duplicate")
+        self.assertEqual(items[("claim", cid)]["disposition"], "rejected")
+        self.assertEqual(items[("source", "unused")]["status"], "unused_source")
+        self.assertNotIn("unused", self.s.project(self.s.read())["sources"])
+    def test_cli_where_and_show(self):
+        cid = self.s.ingest(batch())["accepted"][0]
+        for args, key in ((["where"], "resolved_from"), (["show", cid], "sources")):
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                self.assertEqual(contextme.main(["--workspace", str(self.root)] + args), 0)
+            self.assertIn(key, json.loads(output.getvalue()))
+    def test_missing_workspace_does_not_create_an_implicit_store(self):
+        pointer = Path(self.tmp.name) / "absent" / "location.json"
+        with patch.object(contextme, "LOCATION", pointer), patch.dict(os.environ, {}, clear=True):
+            with contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(contextme.main(["where"]), 2)
+                self.assertEqual(contextme.main(["init"]), 2)
+        self.assertFalse(pointer.parent.exists())
+    def test_install_reports_reading_paths(self):
+        home = Path(self.tmp.name) / "home"
+        result = install("codex", home, workspace=self.root)
+        self.assertEqual(result["read_next"]["index"], str(self.root.resolve() / "INDEX.md"))
+    def test_cli_init_preserves_workspace_selection_origin(self):
+        output = io.StringIO()
+        with patch.dict(os.environ, {"CONTEXTME_WORKSPACE": str(self.root)}), contextlib.redirect_stdout(output):
+            self.assertEqual(contextme.main(["init"]), 0)
+        self.assertEqual(json.loads(output.getvalue())["resolved_from"], "environment")
     def test_demo_roundtrip_and_integrity(self):
         self.s.ingest(DEMO)
         self.assertTrue(self.s.doctor()["ok"])

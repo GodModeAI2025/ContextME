@@ -48,11 +48,12 @@ def install(target: str, home: Path, project: Path | None = None,
             shutil.rmtree(temp, ignore_errors=True)
     if workspace:
         workspace = workspace.expanduser().resolve()
-        Store(workspace).init()
+        initialized = Store(workspace).init()
         location = home.expanduser().resolve() / ".contextme" / "location.json"
         write_json(location, {"workspace": str(workspace)})
         result["workspace"] = str(workspace)
         result["workspace_pointer"] = str(location)
+        result["read_next"] = initialized["read_next"]
     return result
 
 
